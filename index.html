@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+4gk9Gk/3p2b9gqgqkGqv0mYw5p3y0bq+Vx3r6Y2o=" crossorigin=""/>
   <style>
     #checkin-map { height: 320px; border: 1px solid #ddd; margin-top: 0.5rem; }
-    .checkin-panel { max-width: 900px; margin: 1rem auto; padding: 1rem; border: 1px solid #eee; bacprkground:#fafafa; }
+    .checkin-panel { max-width: 900px; margin: 1rem auto; padding: 1rem; border: 1px solid #eee; background:#fafafa; }
     .checkin-list { margin-top: 0.5rem; max-height: 160px; overflow:auto; font-size:0.95rem; }
     .btn-checkin { background:#007bff;color:#fff;border:none;padding:0.6rem 0.9rem;border-radius:6px;cursor:pointer }
     .btn-clear { background:#dc3545;color:#fff;border:none;padding:0.4rem 0.7rem;border-radius:6px;cursor:pointer }
@@ -148,6 +148,19 @@
       targetMarker.bindPopup('<b>มหาวิทยาลัยราชภัฏเทพสตรี</b>');
       const targetCircle = L.circle([target.lat, target.lng], { radius: allowedRadius, color: '#28a745', fill:false }).addTo(targetLayer);
 
+      // current user location marker + accuracy circle (shown on load and when locating)
+      let userMarker = null;
+      let userAccuracyCircle = null;
+
+      function showUserPosition(lat, lng, accuracy){
+        // remove previous
+        if(userMarker){ map.removeLayer(userMarker); userMarker = null; }
+        if(userAccuracyCircle){ map.removeLayer(userAccuracyCircle); userAccuracyCircle = null; }
+        userMarker = L.marker([lat, lng], { title: 'ตำแหน่งปัจจุบัน' }).addTo(map);
+        userMarker.bindPopup('<b>ตำแหน่งปัจจุบัน</b>');
+        userAccuracyCircle = L.circle([lat, lng], { radius: Math.max(8, accuracy||8), color:'#007bff', fill:false }).addTo(map);
+      }
+
       function saveCheckin(obj){
         const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
         arr.unshift(obj);
@@ -182,7 +195,15 @@
           el.innerHTML = '<strong>'+new Date(c.ts).toLocaleString()+'</strong><br>lat: '+c.lat.toFixed(6)+', lng: '+c.lng.toFixed(6)+' (acc '+(c.accuracy||0)+' m) — ระยะจากเป้าหมาย: '+dist+' m';
           listEl.appendChild(el);
         });
-        try{ map.fitBounds(markers.getBounds().extend(targetCircle.getBounds()), { maxZoom: 16 }); }catch(e){ map.setView([target.lat, target.lng], 15); }
+        // fit bounds to include target and checkins (and user marker if present)
+        try{
+          const layers = [];
+          layers.push(targetCircle);
+          markers.getLayers().forEach(l => layers.push(l));
+          if(userAccuracyCircle) layers.push(userAccuracyCircle);
+          const group = L.featureGroup(layers);
+          map.fitBounds(group.getBounds(), { maxZoom: 16 });
+        }catch(e){ map.setView([target.lat, target.lng], 15); }
       }
 
       document.getElementById('btnCheckin').addEventListener('click', function(){
@@ -197,6 +218,7 @@
             // add a temporary marker to show user's location
             markers.clearLayers();
             const temp = L.circle([lat, lng], { radius: Math.max(8, pos.coords.accuracy||8), color:'#ff0000', fill:false }).addTo(markers);
+            showUserPosition(lat, lng, pos.coords.accuracy);
             map.panTo([lat, lng]);
             return;
           }
@@ -217,7 +239,16 @@
         }
       });
 
-      // initial
+      // initial: try to locate user and center map on their position; fallback to target
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(function(pos){
+          const lat = pos.coords.latitude, lng = pos.coords.longitude;
+          showUserPosition(lat, lng, pos.coords.accuracy);
+          map.setView([lat, lng], 15);
+        }, function(){
+          // ignore error - leave map centered on target
+        }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 });
+      }
       renderList();
     })();
   </script>
