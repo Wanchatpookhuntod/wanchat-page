@@ -130,12 +130,23 @@
       const mapEl = document.getElementById('checkin-map');
       const listEl = document.getElementById('checkinList');
 
-      const map = L.map('checkin-map').setView([13.736717,100.523186], 13);
+      // Check-in target: มหาวิทยาลัยราชภัฏเทพสตรี
+      const target = { lat: 14.7993744, lng: 100.6224930 };
+      const allowedRadius = 1000; // meters
+
+      const map = L.map('checkin-map').setView([target.lat, target.lng], 15);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
       }).addTo(map);
-      const markers = L.layerGroup().addTo(map);
+
+      const markers = L.layerGroup().addTo(map); // user checkins
+      const targetLayer = L.layerGroup().addTo(map); // persistent target marker + circle
+
+      // draw target marker and allowed radius
+      const targetMarker = L.marker([target.lat, target.lng]).addTo(targetLayer);
+      targetMarker.bindPopup('<b>มหาวิทยาลัยราชภัฏเทพสตรี</b>');
+      const targetCircle = L.circle([target.lat, target.lng], { radius: allowedRadius, color: '#28a745', fill:false }).addTo(targetLayer);
 
       function saveCheckin(obj){
         const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
@@ -148,6 +159,16 @@
         m.bindPopup('<b>เช็คอิน</b><br>'+new Date(c.ts).toLocaleString());
       }
 
+      function distanceMeters(lat1, lon1, lat2, lon2){
+        const toRad = x => x * Math.PI / 180;
+        const R = 6371000;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+      }
+
       function renderList(){
         listEl.innerHTML = '';
         markers.clearLayers();
@@ -157,10 +178,11 @@
           addMarker(c);
           const el = document.createElement('div');
           el.style.padding = '6px 0';
-          el.innerHTML = '<strong>'+new Date(c.ts).toLocaleString()+'</strong><br>lat: '+c.lat.toFixed(6)+', lng: '+c.lng.toFixed(6)+' (acc '+(c.accuracy||0)+' m)';
+          const dist = Math.round(distanceMeters(c.lat, c.lng, target.lat, target.lng));
+          el.innerHTML = '<strong>'+new Date(c.ts).toLocaleString()+'</strong><br>lat: '+c.lat.toFixed(6)+', lng: '+c.lng.toFixed(6)+' (acc '+(c.accuracy||0)+' m) — ระยะจากเป้าหมาย: '+dist+' m';
           listEl.appendChild(el);
         });
-        try{ map.fitBounds(markers.getBounds(), { maxZoom: 16 }); }catch(e){ /* single marker */ }
+        try{ map.fitBounds(markers.getBounds().extend(targetCircle.getBounds()), { maxZoom: 16 }); }catch(e){ map.setView([target.lat, target.lng], 15); }
       }
 
       document.getElementById('btnCheckin').addEventListener('click', function(){
@@ -168,7 +190,17 @@
         if(!navigator.geolocation){ statusEl().textContent = 'อุปกรณ์ไม่รองรับ Geolocation'; return; }
         statusEl().textContent = 'กำลังรับพิกัด...';
         navigator.geolocation.getCurrentPosition(function(pos){
-          const c = { ts: Date.now(), lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy };
+          const lat = pos.coords.latitude, lng = pos.coords.longitude;
+          const dist = distanceMeters(lat, lng, target.lat, target.lng);
+          if(dist > allowedRadius){
+            statusEl().textContent = 'อยู่นอกพื้นที่อนุญาต (ระยะ '+Math.round(dist)+' เมตร) ต้องอยู่ไม่เกิน 1,000 เมตร';
+            // add a temporary marker to show user's location
+            markers.clearLayers();
+            const temp = L.circle([lat, lng], { radius: Math.max(8, pos.coords.accuracy||8), color:'#ff0000', fill:false }).addTo(markers);
+            map.panTo([lat, lng]);
+            return;
+          }
+          const c = { ts: Date.now(), lat: lat, lng: lng, accuracy: pos.coords.accuracy };
           saveCheckin(c);
           renderList();
           statusEl().textContent = 'เช็คอินสำเร็จ';
