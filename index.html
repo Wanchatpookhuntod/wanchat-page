@@ -1,1 +1,193 @@
-Hello Github
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>พอร์ตโฟลิโอส่วนตัว</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+4gk9Gk/3p2b9gqgqkGqv0mYw5p3y0bq+Vx3r6Y2o=" crossorigin=""/>
+  <style>
+    #checkin-map { height: 320px; border: 1px solid #ddd; margin-top: 0.5rem; }
+    .checkin-panel { max-width: 900px; margin: 1rem auto; padding: 1rem; border: 1px solid #eee; bacprkground:#fafafa; }
+    .checkin-list { margin-top: 0.5rem; max-height: 160px; overflow:auto; font-size:0.95rem; }
+    .btn-checkin { background:#007bff;color:#fff;border:none;padding:0.6rem 0.9rem;border-radius:6px;cursor:pointer }
+    .btn-clear { background:#dc3545;color:#fff;border:none;padding:0.4rem 0.7rem;border-radius:6px;cursor:pointer }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">PORTFOLIO</div>
+      <nav>
+        <a href="#about">เกี่ยวกับ</a>
+        <a href="#skills">ทักษะ</a>
+        <a href="#projects">ผลงาน</a>
+        <a href="#contact">ติดต่อ</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-text">
+        <p class="hero-tagline">สวัสดีครับ / ค่ะ</p>
+        <h1>ผมคือ Wanchat Pookhuntod นักพัฒนาเว็บที่รักการสร้างประสบการณ์ใช้งาน</h1>
+        <p>ผมมีประสบการณ์ในการออกแบบและพัฒนาเว็บไซต์ด้วย HTML, CSS, JavaScript และเฟรมเวิร์กสมัยใหม่ รวมถึงการทำงานร่วมกับทีมเพื่อสร้างโปรเจกต์ที่เป็นมิตรต่อผู้ใช้และมีประสิทธิภาพสูง</p>
+        <a class="btn-primary" href="#contact">ติดต่อผม</a>
+      </div>
+      <div class="hero-image">
+        <div></div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <h2>เกี่ยวกับผม</h2>
+      <div class="card">
+        <div class="card-title">สายงาน</div>
+        <div class="card-text">นักพัฒนาเว็บที่ชอบสร้างเว็บไซต์สวยงามและใช้งานง่าย โฟกัสที่การออกแบบ UX/UI, responsive design และ performance</div>
+      </div>
+      <div class="card" style="margin-top:1rem;">
+        <div class="card-title">เป้าหมาย</div>
+        <div class="card-text">ต้องการพัฒนาโซลูชันที่ตอบโจทย์ผู้ใช้งานจริง พร้อมเรียนรู้เทคโนโลยีใหม่ ๆ และเติบโตเป็น Full Stack Developer</div>
+      </div>
+    </section>
+
+    <section id="skills" class="section">
+      <h2>ทักษะของผม</h2>
+      <div class="card">
+        <div class="card-text">ผมถนัดทั้งในการเขียนโค้ดและการจัดการ workflow ของโปรเจกต์ โดยมีทักษะสำคัญดังนี้</div>
+        <div class="skills-list">
+          <span class="skill-chip">HTML</span>
+          <span class="skill-chip">CSS</span>
+          <span class="skill-chip">JavaScript</span>
+          <span class="skill-chip">React</span>
+          <span class="skill-chip">Vue</span>
+          <span class="skill-chip">Node.js</span>
+          <span class="skill-chip">Git</span>
+          <span class="skill-chip">Responsive Design</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section">
+      <h2>ผลงานเด่น</h2>
+      <div class="card-grid">
+        <div class="card project-card">
+          <div class="card-title">เว็บไซต์ร้านค้าออนไลน์</div>
+          <p>พัฒนาเว็บไซต์ร้านค้าออนไลน์ด้วยระบบตะกร้าสินค้าและหน้าแสดงรายการสินค้า รองรับทั้งบนเดสก์ท็อปและมือถือ</p>
+          <div class="project-meta">HTML / CSS / JavaScript / API</div>
+        </div>
+        <div class="card project-card">
+          <div class="card-title">แดชบอร์ดข้อมูล</div>
+          <p>ออกแบบแดชบอร์ดสำหรับวิเคราะห์ข้อมูลธุรกิจ พร้อมกราฟและตัวกรองข้อมูลแบบเรียลไทม์</p>
+          <div class="project-meta">React / Chart.js / REST API</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <h2>ติดต่อ</h2>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="card-title">ชื่อ</div>
+          <p>[ชื่อ-นามสกุลของคุณ]</p>
+        </div>
+        <div class="contact-card">
+          <div class="card-title">อีเมล</div>
+          <p>your.email@example.com</p>
+        </div>
+        <div class="contact-card">
+          <div class="card-title">โทรศัพท์</div>
+          <p>012-345-6789</p>
+        </div>
+        <div class="contact-card">
+          <div class="card-title">LinkedIn / GitHub</div>
+          <p>linkedin.com/in/yourname<br>github.com/yourname</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="checkin" class="section">
+      <h2>Check-in (GPS)</h2>
+      <div class="checkin-panel">
+        <div>
+          <button id="btnCheckin" class="btn-checkin">เช็คอินตอนนี้</button>
+          <button id="btnClear" class="btn-clear" title="ลบข้อมูลเช็คอินทั้งหมด">ลบทั้งหมด</button>
+          <span id="status" style="margin-left:0.8rem;color:#333"></span>
+        </div>
+        <div id="checkin-map"></div>
+        <div class="checkin-list" id="checkinList"></div>
+      </div>
+    </section>
+
+    <footer>
+      สร้างหน้าเว็บพอร์ตโฟลิโอด้วย HTML และ CSS โดย GitHub Copilot
+    </footer>
+  </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kM0b3s8k3f3pZ6YhQ5Qv1+gqX1c6f4g9gXk8M=" crossorigin=""></script>
+  <script>
+    (function(){
+      const storageKey = 'wanchat_checkins';
+      const statusEl = () => document.getElementById('status');
+      const mapEl = document.getElementById('checkin-map');
+      const listEl = document.getElementById('checkinList');
+
+      const map = L.map('checkin-map').setView([13.736717,100.523186], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+      const markers = L.layerGroup().addTo(map);
+
+      function saveCheckin(obj){
+        const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        arr.unshift(obj);
+        localStorage.setItem(storageKey, JSON.stringify(arr));
+      }
+
+      function addMarker(c){
+        const m = L.marker([c.lat, c.lng]).addTo(markers);
+        m.bindPopup('<b>เช็คอิน</b><br>'+new Date(c.ts).toLocaleString());
+      }
+
+      function renderList(){
+        listEl.innerHTML = '';
+        markers.clearLayers();
+        const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        if(!arr.length){ listEl.innerHTML = '<div>ยังไม่มีเช็คอิน</div>'; return; }
+        arr.forEach(c => {
+          addMarker(c);
+          const el = document.createElement('div');
+          el.style.padding = '6px 0';
+          el.innerHTML = '<strong>'+new Date(c.ts).toLocaleString()+'</strong><br>lat: '+c.lat.toFixed(6)+', lng: '+c.lng.toFixed(6)+' (acc '+(c.accuracy||0)+' m)';
+          listEl.appendChild(el);
+        });
+        try{ map.fitBounds(markers.getBounds(), { maxZoom: 16 }); }catch(e){ /* single marker */ }
+      }
+
+      document.getElementById('btnCheckin').addEventListener('click', function(){
+        statusEl().textContent = '';
+        if(!navigator.geolocation){ statusEl().textContent = 'อุปกรณ์ไม่รองรับ Geolocation'; return; }
+        statusEl().textContent = 'กำลังรับพิกัด...';
+        navigator.geolocation.getCurrentPosition(function(pos){
+          const c = { ts: Date.now(), lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy };
+          saveCheckin(c);
+          renderList();
+          statusEl().textContent = 'เช็คอินสำเร็จ';
+        }, function(err){
+          statusEl().textContent = 'ไม่สามารถรับพิกัด: ' + err.message;
+        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+      });
+
+      document.getElementById('btnClear').addEventListener('click', function(){
+        if(confirm('ลบข้อมูลเช็คอินทั้งหมด?')){
+          localStorage.removeItem(storageKey);
+          renderList();
+          statusEl().textContent = 'ลบแล้ว';
+        }
+      });
+
+      // initial
+      renderList();
+    })();
+  </script>
+</body>
+</html>
